@@ -14,7 +14,7 @@ COMPILER Tastier
     Const,
     Var,
     Proc
-  };
+ };
 
 /*
   You'll notice some type aliases, such as the one just below, are commented
@@ -606,22 +606,18 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                 }
 
                                 program.Add(new Instruction("", "Equ"));
-                                program.Add(new Instruction(openLabels.Peek(), "FJmp"));
+                                program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
                               .)
       [Stat]                    (.program.Add(new Instruction(openLabels.Pop(), "Nop"));.)
     }
     [
-      "deafault" ':'
+      "default" ':'
       [Stat]
     ]
     '}'                         (.program.Add(new Instruction(openBreakableStats.Pop(), "Nop"));.)
 
 | "break" ';'                   (.
-                                  if (openBreakableStats.Peek() != null){
-                                    program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
-                                  } else {
-                                    SemErr("not allowed to break here");
-                                  }
+                                  program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
                                 .)
 
 | "while"                       (.  string loopStartLabel = generateLabel();

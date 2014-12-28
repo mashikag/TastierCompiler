@@ -591,8 +591,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
 
                                   n = Convert.ToInt32(t.val);
                                   program.Add(new Instruction("", "Const " + n));
-                              .)
-      ':'                     (.
+
                                 if (switchSym.Item4 == 0) {
                                   if (isExternal) {
                                     program.Add(new Instruction("", "LoadG " + switchSym.Item1));
@@ -611,7 +610,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
       [Stat]                    (.program.Add(new Instruction(openLabels.Pop(), "Nop"));.)
     }
     [
-      "deafault" ':'
+      "default"
       [Stat]
     ]
     '}'                         (.program.Add(new Instruction(openBreakableStats.Pop(), "Nop"));.)
