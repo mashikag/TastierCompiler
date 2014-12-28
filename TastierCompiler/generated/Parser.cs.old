@@ -797,11 +797,7 @@ Stack<string> openBreakableStats = new Stack<string>();
 		case 29: {
 			Get();
 			Expect(21);
-			if (openBreakableStats.Peek() != null){
-			 program.Add(new Instruction(openBreakableStats.Peek(), "Nop"));
-			} else {
-			 SemErr("not allowed to break here");
-			}
+			program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
 			
 			break;
 		}

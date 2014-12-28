@@ -10,6 +10,14 @@ program Test {
   void Main() {
     int varHope;
     varHope := 5;
+	switch(varHope){
+		case 5:
+			{
+			write 5;
+			}
+		default:{
+			write 0;}
+	}
     write hope;
   }
 }

@@ -7,9 +7,7 @@ Sto 0 0
 Const 5
 Load 0 0
 Equ
-L$1: FJmp
-Const 5
-Write
+FJmp L$1
 L$1: Nop
 L$0: Nop
 Const 5
