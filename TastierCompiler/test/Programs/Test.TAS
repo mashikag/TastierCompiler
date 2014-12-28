@@ -9,18 +9,21 @@ program Test {
 
   void Main() {
     int varHope;
-    varHope := 5;
+    varHope := 6;
 	switch(varHope){
 		case 5:
-			{
+		{
 			write 5;
-			}
+		}
 		case 6:
 		{
 			write 6;
 		}
+		default:
+		{
+			write 7;
+		}
 	}
-    write hope;
   }
 }
 

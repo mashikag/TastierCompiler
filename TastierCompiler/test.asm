@@ -2,7 +2,7 @@
 .proc Main
 .var 1 i
 Main: Enter 1
-Const 5
+Const 6
 Sto 0 0
 Const 5
 Load 0 0
