@@ -617,11 +617,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
     '}'                         (.program.Add(new Instruction(openBreakableStats.Pop(), "Nop"));.)
 
 | "break" ';'                   (.
-                                  if (openBreakableStats.Peek() != null){
-                                    program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
-                                  } else {
-                                    SemErr("not allowed to break here");
-                                  }
+                                  program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
                                 .)
 
 | "while"                       (.  string loopStartLabel = generateLabel();
