@@ -7,11 +7,6 @@ program Test {
   const hope1 := 10;
   int i;
 
-  void SumUp() {
-    int sum;
-    sum := 0;
-  }
-
   void Main() {
     int varHope;
     varHope := 5;
