@@ -1,0 +1,32 @@
+// This program is a test case for memory holes being gone; i and j should live
+// at consecutive addresses in memory even though a procedure is declared between
+
+program Test {
+  int i;
+
+  void Foo() {
+    int a, b, max;
+    read a; read b;
+    if (a > b) max = a; else max = b;
+    write max;
+  }
+
+  int j;
+
+  void SumUp() {
+    i = j;
+    int sum;
+    sum = 0;
+    while (i > 0) { sum = sum + i; i = i - 1; }
+    write sum;
+  }
+
+  void Main() {
+    read j;
+    while (j > 0) {
+      SumUp();
+      read j;
+    }
+  }
+}
+
