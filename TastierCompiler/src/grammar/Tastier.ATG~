@@ -247,6 +247,10 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   manipulate them, you can LoadG and StoG to those locations.
 */
 
+
+/*the below stack allows for nesting break statements inside nested loops*/
+Stack<string> openBreakableStats = new Stack<string>();
+
 /*--------------------------------------------------------------------------*/
 
 CHARACTERS
@@ -572,6 +576,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
 
 | "switch"                      (.Symbol switchSym; int n;.)
   '(' Ident<out name> ')'       (.
+                                  openBreakableStats.Push(generateLabel());
                                   switchSym = lookup(openScopes, name);
                                   if(switchSym.Item2 != (int)TastierKind.Var){
                                     SemErr("only variables may be switched.");
@@ -581,32 +586,44 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                 .)
   '{'                           
     {
-      "case" number ':'         (.
+      "case" number          (.
                                   openLabels.Push(generateLabel());
 
                                   n = Convert.ToInt32(t.val);
                                   program.Add(new Instruction("", "Const " + n));
-
-                                  if (switchSym.Item4 == 0) {
-                                      if (isExternal) {
-                                        program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                        // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                      } else {
-                                        program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                      }
+                              .)
+      ':'                     (.
+                                if (switchSym.Item4 == 0) {
+                                  if (isExternal) {
+                                    program.Add(new Instruction("", "LoadG " + switchSym.Item1));
+                                    // if the symbol is external, we load it by name. The linker will resolve the name to an address.
                                   } else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                    program.Add(new Instruction("", "LoadG " + (switchSym.Item5+3)));
                                   }
+                                } else {
+                                  int lexicalLevelDifference = Math.Abs(openScopes.Count - switchSym.Item4)-1;
+                                  program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + switchSym.Item5));
+                                }
 
-                                  program.Add(new Instruction("", "Equ"));
-                                  program.Add(new Instruction(openLabels.Peek(), "FJmp"));
-                                .)
+                                program.Add(new Instruction("", "Equ"));
+                                program.Add(new Instruction(openLabels.Peek(), "FJmp"));
+                              .)
       [Stat]                    (.program.Add(new Instruction(openLabels.Pop(), "Nop"));.)
     }
     [
       "deafault" ':'
+      [Stat]
     ]
+    '}'                         (.program.Add(new Instruction(openBreakableStats.Pop(), "Nop"));.)
+
+| "break" ';'                   (.
+                                  if (!openBreakableStats.isEmpty()){
+                                    program.Add(new Instruction(openBreakableStats.Peek(), "Nop"));
+                                  } else {
+                                    SemErr("not allowed to break here");
+                                  }
+                                .)
+
 | "while"                       (.  string loopStartLabel = generateLabel();
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));

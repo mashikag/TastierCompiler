@@ -7,25 +7,12 @@ program Test {
   const hope1 := 10;
   int i;
 
-  void SumUp() {
-    int sum;
-    sum := 0;
-    while (i > 0) { sum := sum + i; i := i - 1; }
-    write sum;
-  }
-
   void Main() {
-    int test;
-    test := false ? 1 : 2;
-    write test;
-    
-    for(test := 10; test := test -1; test > 0){
-      write test;
-    }
-    read i;
-    while (i > 0) {
-      SumUp();
-      read i;
+    int varHope;
+    varHope := 5;
+    switch(varHope){
+      case 5:
+        write hope;
     }
     write hope;
   }

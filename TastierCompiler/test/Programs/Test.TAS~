@@ -10,18 +10,14 @@ program Test {
   void SumUp() {
     int sum;
     sum := 0;
-    while (i > 0) { sum := sum + i; i := i - 1; }
-    write sum;
   }
 
   void Main() {
-    int test;
-    test := true ? 1 : 2;
-    write test;
-    read i;
-    while (i > 0) {
-      SumUp();
-      read i;
+    int varHope;
+    varHope := 5;
+    switch(varHope){
+      case 5:
+        write hope;
     }
     write hope;
   }
