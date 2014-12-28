@@ -15,8 +15,10 @@ program Test {
 			{
 			write 5;
 			}
-		default:{
-			write 0;}
+		case 6:
+		{
+			write 6;
+		}
 	}
     write hope;
   }

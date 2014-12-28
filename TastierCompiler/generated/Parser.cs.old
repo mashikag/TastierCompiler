@@ -39,7 +39,7 @@ enum TastierType : int {   // types for variables
     Const,
     Var,
     Proc
-  };
+ };
 
 /*
   You'll notice some type aliases, such as the one just below, are commented
@@ -776,7 +776,7 @@ Stack<string> openBreakableStats = new Stack<string>();
 				}
 				
 				program.Add(new Instruction("", "Equ"));
-				program.Add(new Instruction(openLabels.Peek(), "FJmp"));
+				program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
 				
 				if (StartOf(3)) {
 					Stat();
