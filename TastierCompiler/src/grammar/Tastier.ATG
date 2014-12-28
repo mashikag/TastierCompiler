@@ -618,7 +618,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
 
 | "break" ';'                   (.
                                   if (openBreakableStats.Peek() != null){
-                                    program.Add(new Instruction(openBreakableStats.Peek(), "Nop"));
+                                    program.Add(new Instruction("", "Jmp " + openBreakableStats.Peek()));
                                   } else {
                                     SemErr("not allowed to break here");
                                   }
