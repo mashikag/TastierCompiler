@@ -247,6 +247,10 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   manipulate them, you can LoadG and StoG to those locations.
 */
 
+
+/*the below stack allows for nesting break statements inside nested loops*/
+Stack<string> openBreakableStats = new Stack<string>();
+
 /*--------------------------------------------------------------------------*/
 
 CHARACTERS
