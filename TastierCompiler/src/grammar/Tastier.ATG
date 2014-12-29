@@ -7,14 +7,15 @@ COMPILER Tastier
   enum TastierType : int {   // types for variables
     Undefined,
     Integer,
-    Boolean
+    Boolean,
+    String
   };
 
   enum TastierKind : int {  // kinds of symbol
     Const,
     Var,
     Proc
- };
+  };
 
 /*
   You'll notice some type aliases, such as the one just below, are commented
@@ -259,7 +260,7 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
-
+  stringChars = letter | digit | cr | lf | tab.
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
@@ -813,16 +814,42 @@ ConstDecl                       (.
                                 .)
 
 = "const"       
-  Ident<out name>               (.  if(_lookup(currentScope, name) != null){
-                                      SemErr("redefined identifier in the same scope.");
-                                    }
+  Ident<out name>               (.
+                                  if(_lookup(currentScope, name) != null){
+                                    SemErr("redefined identifier in the same scope.");
+                                  }
                                 .)
   ":="
-  ( number                      (.type = (int)TastierType.Integer; val = Convert.ToInt32(t.val);.)
-  | ("true"                     (.type = (int)TastierType.Boolean; val = 1;.)
-    |"false")                   (.type = (int)TastierType.Boolean; val = 0;.)
-  )                             (.currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));.)
-  ';'.
+  ( number                      (.
+                                  type = (int)TastierType.Integer; val = Convert.ToInt32(t.val);
+                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
+                                .)
+  | ( 
+       "true"                   (.
+                                  type = (int)TastierType.Boolean; val = 1;
+                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
+                                .)
+       | "false"                (.
+                                  type = (int)TastierType.Boolean; val = 0;.
+                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
+                                .)
+    )
+  | ( '"'                       (.
+                                  Symbo lenSym = new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0);
+                                  int len = 0;
+                                .)
+      {
+        stringChars             (.
+                                  charVal = Convert.ToInt32(t.val);
+                                  currentScope.Push(new Symbol(name+"\\"+len, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, charVal));
+                                  len++;
+                                .)
+      }
+      '"')                      (.
+                                  lenSym.Item5 = len;
+                                  currentScope.Push(lenSym); 
+                                .)
+  ) ';'.
 
 /*------------------------------------------------------------------------*/
 
