@@ -815,28 +815,16 @@ ConstDecl                       (.
                                     string name; int type = 0; int val = 0; Scope currentScope = openScopes.Peek();
                                 .)
 
-= "const"       
-  Ident<out name>               (.
-                                  if(_lookup(currentScope, name) != null){
-                                    SemErr("redefined identifier in the same scope.");
-                                  }
+= "const"
+  Ident<out name>               (.  if(_lookup(currentScope, name) != null){
+                                      SemErr("redefined identifier in the same scope.");
+                                    }
                                 .)
   ":="
-  ( number                      (.
-                                  type = (int)TastierType.Integer; val = Convert.ToInt32(t.val);
-                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-                                .)
-  | ( 
-       "true"                   (.
-                                  type = (int)TastierType.Boolean; val = 1;
-                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-                                .)
-       | "false"                (.
-                                  type = (int)TastierType.Boolean; val = 0;
-                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-                                .)
-    )
-  | ( '"'                       (.
+  ( number                      (.currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Integer, openScopes.Count-1, Convert.ToInt32(t.val)));.)
+  | ("true"                     (.currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Boolean, openScopes.Count-1, 1));.)
+    |"false")                   (.currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Boolean, openScopes.Count-1, 0));.)
+  | ( '\"'                       (.
                                   int len = 0;
                                 .)
       {
@@ -846,10 +834,11 @@ ConstDecl                       (.
                                   len++;
                                 .)
       }
-      '"')                      (.
+      '\"')                      (.
                                   currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0)); 
                                 .)
-  ) ';'.
+  )                             
+  ';'.
 
 /*------------------------------------------------------------------------*/
 
