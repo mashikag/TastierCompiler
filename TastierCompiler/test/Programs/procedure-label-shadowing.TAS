@@ -1,0 +1,46 @@
+// This program is a test case for nested procedures working properly.
+
+// The compiler uses the name of a procedure as its label. This can cause
+// problems when a local procedure *inside* another procedure has the same name
+// as a procedure in an enclosing scope. The local procedure should _shadow_ the
+// outer procedure, so calls to that name in the inner procedure should call
+// the inner, not outer, procedure.
+
+// Look at the assembly produced by compiling this program and see how the
+// shadowing operates. Which labels are called at which points?
+
+program Test {
+
+  int number;
+
+  void func() {
+    number = 3;
+  }
+
+  void func2() {
+    number = 5;
+
+    void func3() {
+      number = 6;
+
+      void func() {
+        number = 7;
+      }
+
+      func(); // this should call the func() we defined in *this* scope!
+    }
+
+    func3();
+  }
+
+  void Main() {
+
+    void func() {
+      number = 4;
+    }
+
+    func2();
+    write number;
+    //we should see 7, because func2->func3->func was the last thing that set number
+  }
+}

@@ -1,0 +1,24 @@
+// This is the module with the Main function in it. For this code to work, it
+// needs to be linked with the module externalTest.TAS
+
+program Test {
+  external int i;
+  external procedure Test;
+  int j;
+
+  void Useless() {
+    int uselessLocal;
+    j = 4;
+    uselessLocal = 5;
+    while (uselessLocal > 0) {
+      uselessLocal = uselessLocal - 1;
+    }
+    write uselessLocal;
+  }
+
+  void Main() {
+    i = 10;
+    Test();
+  }
+}
+

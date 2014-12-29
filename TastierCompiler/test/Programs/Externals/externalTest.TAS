@@ -1,0 +1,14 @@
+// This is the module that defines the int i and the procedure Test
+
+program Test {
+  int i;
+
+  void Test() {
+    int sum;
+    sum = 0;
+    while (i > 0) {
+      sum = sum + i; i = i - 1;
+    }
+    write sum;
+  }
+}

@@ -1,0 +1,29 @@
+// This is a test program which can be compiled by the TastierCompiler.
+// It reads a sequence of numbers from the input file and computes, for each
+// number, the sum of all integers up to that number
+
+program Test {
+  const hope := 5;
+  const hope1 := 10;
+  int i;
+
+  void SumUp() {
+    int sum;
+    sum := 0;
+    while (i > 0) { sum := sum + i; i := i - 1; }
+    write sum;
+  }
+
+  void Main() {
+    int test;
+    test := true ? 1 : 2;
+    write test;
+    read i;
+    while (i > 0) {
+      SumUp();
+      read i;
+    }
+    write hope;
+  }
+}
+
