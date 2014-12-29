@@ -12,6 +12,10 @@ program Test {
     test := false ? 1 : 2;
     write test;
     switch(test){
+      case 2{
+        write 2;
+        break;      
+      }
       case 5{
         write 5;
         break;

@@ -568,10 +568,10 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                     program.Add(new Instruction("", "Const " + n));
                     if (switchSym.Item4 == 0) {
                       if (isExternal) {
-                      program.Add(new Instruction("", "LoadG " + switchSym.Item1));
-                      // if the symbol is external, we load it by name. The linker will resolve the name to an address.
+                        program.Add(new Instruction("", "LoadG " + switchSym.Item1));
+                        // if the symbol is external, we load it by name. The linker will resolve the name to an address.
                       } else {
-                      program.Add(new Instruction("", "LoadG " + (switchSym.Item5+3)));
+                        program.Add(new Instruction("", "LoadG " + (switchSym.Item5+3)));
                       }
                     } else {
                       int lexicalLevelDifference = Math.Abs(openScopes.Count - switchSym.Item4)-1;

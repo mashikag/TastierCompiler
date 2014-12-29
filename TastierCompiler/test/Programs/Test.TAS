@@ -5,7 +5,6 @@
 program Test {
   const hope := 5;
   const hope1 := 10;
-  int i;
 
   void Main() {
     int test;

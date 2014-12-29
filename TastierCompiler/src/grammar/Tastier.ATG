@@ -261,8 +261,10 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   tab = '\t'.
 
 TOKENS
-  ident  = letter {letter | digit}.
-  number = digit {digit}.
+  charT = letter.
+  digitT = digit.
+  ident = letter (letter | digit) {letter | digit}.
+  number = digit digit {digit}.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
