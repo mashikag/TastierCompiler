@@ -260,10 +260,12 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
-  stringChars = letter | digit | cr | lf | tab.
+
 TOKENS
-  ident  = letter {letter | digit}.
-  number = digit {digit}.
+  charT = letter.
+  digitT = digit.
+  ident  = letter (letter | digit) {letter | digit}.
+  number = digit digit {digit}.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -830,24 +832,22 @@ ConstDecl                       (.
                                   currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
                                 .)
        | "false"                (.
-                                  type = (int)TastierType.Boolean; val = 0;.
+                                  type = (int)TastierType.Boolean; val = 0;
                                   currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
                                 .)
     )
   | ( '"'                       (.
-                                  Symbo lenSym = new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0);
                                   int len = 0;
                                 .)
       {
-        stringChars             (.
-                                  charVal = Convert.ToInt32(t.val);
+        charT | digitT          (.
+                                  int charVal = Convert.ToInt32(t.val);
                                   currentScope.Push(new Symbol(name+"\\"+len, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, charVal));
                                   len++;
                                 .)
       }
       '"')                      (.
-                                  lenSym.Item5 = len;
-                                  currentScope.Push(lenSym); 
+                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0)); 
                                 .)
   ) ';'.
 

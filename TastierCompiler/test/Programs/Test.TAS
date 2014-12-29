@@ -5,21 +5,22 @@
 program Test {
   const hope := 5;
   const hope1 := 10;
-  int i;
+  const hope2 := "a";
 
   void Main() {
     int varHope;
-    varHope := 6;
+    varHope := 5;
 	switch(varHope){
-		case 5:
+		case 5
 		{
 			write 5;
+			break;
 		}
-		case 6:
+		case 6
 		{
 			write 6;
 		}
-		default:
+		default
 		{
 			write 7;
 		}
