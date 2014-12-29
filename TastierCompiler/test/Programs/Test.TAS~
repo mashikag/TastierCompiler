@@ -16,8 +16,12 @@ program Test {
 
   void Main() {
     int test;
-    test := true ? 1 : 2;
+    test := false ? 1 : 2;
     write test;
+    
+    for(test := 10; test := test -1; test > 0){
+      write test;
+    }
     read i;
     while (i > 0) {
       SumUp();
