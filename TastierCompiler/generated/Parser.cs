@@ -1039,21 +1039,15 @@ Stack<string> openBreakableStats = new Stack<string>();
 		Expect(22);
 		if (la.kind == 4) {
 			Get();
-			type = (int)TastierType.Integer; val = Convert.ToInt32(t.val);
-			currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-			
+			currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Integer, openScopes.Count-1, Convert.ToInt32(t.val)));
 		} else if (la.kind == 7 || la.kind == 8) {
 			if (la.kind == 7) {
 				Get();
-				type = (int)TastierType.Boolean; val = 1;
-				currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-				
+				currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Boolean, openScopes.Count-1, 1));
 			} else {
 				Get();
-				type = (int)TastierType.Boolean; val = 0;
-				currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
-				
 			}
+			currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.Boolean, openScopes.Count-1, 0));
 		} else if (la.kind == 40) {
 			Get();
 			int len = 0;
