@@ -732,15 +732,15 @@ Stack<string> openBreakableStats = new Stack<string>();
 				n = Convert.ToInt32(t.val);
 				program.Add(new Instruction("", "Const " + n));
 				if (switchSym.Item4 == 0) {
-				if (isExternal) {
-				program.Add(new Instruction("", "LoadG " + switchSym.Item1));
-				// if the symbol is external, we load it by name. The linker will resolve the name to an address.
+				 if (isExternal) {
+				   program.Add(new Instruction("", "LoadG " + switchSym.Item1));
+				   // if the symbol is external, we load it by name. The linker will resolve the name to an address.
+				 } else {
+				   program.Add(new Instruction("", "LoadG " + (switchSym.Item5+3)));
+				 }
 				} else {
-				program.Add(new Instruction("", "LoadG " + (switchSym.Item5+3)));
-				}
-				} else {
-				int lexicalLevelDifference = Math.Abs(openScopes.Count - switchSym.Item4)-1;
-				program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + switchSym.Item5));
+				 int lexicalLevelDifference = Math.Abs(openScopes.Count - switchSym.Item4)-1;
+				 program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + switchSym.Item5));
 				}
 				program.Add(new Instruction("", "Equ"));
 				program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
