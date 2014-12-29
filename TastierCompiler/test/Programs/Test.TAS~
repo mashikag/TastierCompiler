@@ -18,7 +18,15 @@ program Test {
     int test;
     test := false ? 1 : 2;
     write test;
-    
+    switch(test){
+      case 5{
+        write 5;
+        break;      
+      }
+      default{
+        write 7;      
+      }
+    }
     for(test := 10; test := test -1; test > 0){
       write test;
     }
