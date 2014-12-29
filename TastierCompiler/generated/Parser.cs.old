@@ -1056,7 +1056,6 @@ Stack<string> openBreakableStats = new Stack<string>();
 			}
 		} else if (la.kind == 40) {
 			Get();
-			Symbol lenSym = new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0);
 			int len = 0;
 			
 			while (la.kind == 1 || la.kind == 2) {
@@ -1071,8 +1070,7 @@ Stack<string> openBreakableStats = new Stack<string>();
 				}
 			}
 			Expect(40);
-			lenSym.Item5 = len;
-			currentScope.Push(lenSym); 
+			currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0)); 
 			
 		} else SynErr(52);
 		Expect(23);
@@ -1173,7 +1171,7 @@ public class Errors {
 			case 37: s = "\"int\" expected"; break;
 			case 38: s = "\"bool\" expected"; break;
 			case 39: s = "\"const\" expected"; break;
-			case 40: s = "\"\"\" expected"; break;
+			case 40: s = "\"\\\"\" expected"; break;
 			case 41: s = "\",\" expected"; break;
 			case 42: s = "\"external\" expected"; break;
 			case 43: s = "\"procedure\" expected"; break;

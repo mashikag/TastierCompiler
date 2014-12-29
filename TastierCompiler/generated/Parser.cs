@@ -1171,7 +1171,7 @@ public class Errors {
 			case 37: s = "\"int\" expected"; break;
 			case 38: s = "\"bool\" expected"; break;
 			case 39: s = "\"const\" expected"; break;
-			case 40: s = "\"\"\" expected"; break;
+			case 40: s = "\"\\\"\" expected"; break;
 			case 41: s = "\",\" expected"; break;
 			case 42: s = "\"external\" expected"; break;
 			case 43: s = "\"procedure\" expected"; break;

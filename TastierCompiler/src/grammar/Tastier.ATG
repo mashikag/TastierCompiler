@@ -836,7 +836,7 @@ ConstDecl                       (.
                                   currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));
                                 .)
     )
-  | ( '"'                       (.
+  | ( '\"'                       (.
                                   int len = 0;
                                 .)
       {
@@ -846,7 +846,7 @@ ConstDecl                       (.
                                   len++;
                                 .)
       }
-      '"')                      (.
+      '\"')                      (.
                                   currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, 0)); 
                                 .)
   ) ';'.

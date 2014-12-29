@@ -5,7 +5,7 @@
 program Test {
   const hope := 5;
   const hope1 := 10;
-  const hope2 := "a";
+  //const hope2 := "a";
 
   void Main() {
     int varHope;
