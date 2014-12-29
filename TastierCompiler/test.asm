@@ -13,14 +13,22 @@ L$1: Nop
 Sto 0 0
 Load 0 0
 Write
-Const 5
+Const 2
 Load 0 0
 Equ
 FJmp L$3
-Const 5
+Const 2
 Write
 Jmp L$2
 L$3: Nop
+Const 5
+Load 0 0
+Equ
+FJmp L$4
+Const 5
+Write
+Jmp L$2
+L$4: Nop
 Const 7
 Write
 L$2: Nop
