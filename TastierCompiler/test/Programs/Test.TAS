@@ -10,6 +10,7 @@ program Test {
   
   void Main() {
     int test;
+    int testArray [5];
     
     test := false ? 1 : 2;
     write test;
@@ -28,5 +29,7 @@ program Test {
     }
     write hope;
     write strTest;
+    testArray[2] := 5;
+    write testArray[2];
   }
 }

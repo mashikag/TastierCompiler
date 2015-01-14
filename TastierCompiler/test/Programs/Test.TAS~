@@ -6,12 +6,15 @@ program Test {
   const hope := 5;
   const hope1 := 10;
   const strTest := "Proba";
+  
+  
   void Main() {
     int test;
+    int testArray [5];
     
     test := false ? 1 : 2;
     write test;
-    switch(test){
+    switch(test){/*
       case 2{
         write 2;
         break;      
@@ -22,9 +25,11 @@ program Test {
       }
       default{
         write 7;      
-      }
+      }*/
     }
     write hope;
     write strTest;
+    testArray[2] := 5;
+    write testArray[2];
   }
 }
