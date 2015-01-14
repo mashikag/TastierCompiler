@@ -1,6 +1,5 @@
-.names 4
+.names 9
 .proc Main
-.var 1 i
 Main: Enter 1
 Const 0
 FJmp L$0
@@ -34,5 +33,16 @@ Write
 L$2: Nop
 Const 5
 Write
+Const 5
+Const 80
+WriteChar
+Const 114
+WriteChar
+Const 111
+WriteChar
+Const 98
+WriteChar
+Const 97
+WriteChar
 Leave
 Ret

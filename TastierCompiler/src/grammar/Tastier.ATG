@@ -7,7 +7,9 @@ COMPILER Tastier
   enum TastierType : int {   // types for variables
     Undefined,
     Integer,
-    Boolean
+    Boolean,
+    String,
+    Char
   };
 
   enum TastierKind : int {  // kinds of symbol
@@ -259,12 +261,12 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
+  dq = '\"'.
 
 TOKENS
-  charT = letter.
-  digitT = digit.
-  ident = letter (letter | digit) {letter | digit}.
-  number = digit digit {digit}.
+  ident = letter {letter | digit}.
+  number = digit {digit}.
+  str = dq {letter | digit} dq.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -284,7 +286,8 @@ AddOp<out Instruction inst>
 /*------------------------------------------------------------------------*/
 
 Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
-= SimExpr<out type>
+=                               (. type = TastierType.Undefined;.) 
+  (SimExpr<out type>
   [ RelOp<out inst>
     SimExpr<out type1>          (.
                                     if (type != type1) {
@@ -295,7 +298,8 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
                                       type = TastierType.Boolean;
                                     }
                                 .)
-  ].
+  ]
+  ).
 
 /*------------------------------------------------------------------------*/
 
@@ -466,6 +470,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     if (resType != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
                                     }
+                                    
                                     if (sym.Item4 == 0) {
                                       if (isExternal) {
                                         program.Add(new Instruction("", "StoG " + sym.Item1));
@@ -733,13 +738,27 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     }
                                 .)
 
-| "write"
-  Expr<out type> ';'            (.
-                                    if (type != TastierType.Integer) {
-                                      SemErr("integer type expected");
-                                    }
-                                    program.Add(new Instruction("", "Write"));
-                                .)
+| "write" 
+  Expr<out type>           (.
+                              if (type == TastierType.Integer) {
+                                program.Add(new Instruction("", "Write"));
+                              }
+                              else if(type == TastierType.String) {
+                                string varName = t.val;
+                                Console.WriteLine(varName);
+                                sym = lookup(openScopes, varName);
+                                int len = sym.Item5;
+                                Console.WriteLine(len);
+                                for(int i = 0; i < len; i++){
+                                  sym = lookup(openScopes, varName+"["+i+"]");
+                                  program.Add(new Instruction("", "Const " + sym.Item5));
+                                  program.Add(new Instruction("", "WriteChar"));
+                                }
+                              } 
+                              else {
+                                SemErr("integer or string type expected");
+                              }
+                            .)';'
 
 | '{' { Stat | VarDecl<external> } '}' .
 
@@ -801,6 +820,8 @@ Type<out TastierType type>
 =                               (.  type = TastierType.Undefined; .)
  ( "int"                        (.  type = TastierType.Integer; .)
  | "bool"                       (.  type = TastierType.Boolean; .)
+ | "string"                     (.  type = TastierType.String; .)
+ | "char"                       (.  type = TastierType.Char; .)
  ).
 
 /*------------------------------------------------------------------------*/
@@ -814,11 +835,21 @@ ConstDecl                       (.
                                     }
                                 .)
   ":="
-  ( number                      (.type = (int)TastierType.Integer; val = Convert.ToInt32(t.val);.)
-  | ("true"                     (.type = (int)TastierType.Boolean; val = 1;.)
-    |"false")                   (.type = (int)TastierType.Boolean; val = 0;.)
-  )                             (.currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));.)
-  ';'.
+  ( number                      (.type = (int)TastierType.Integer; val = Convert.ToInt32(t.val); currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));.)
+  | ("true"                     (.type = (int)TastierType.Boolean; val = 1; currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));.)
+    |"false")                   (.type = (int)TastierType.Boolean; val = 0; currentScope.Push(new Symbol(name, (int)TastierKind.Const, type, openScopes.Count-1, val));.)
+  | str                         (.
+                                  type = (int)TastierType.String;
+                                  currentScope.Push(new Symbol(name, (int)TastierKind.Const, (int)TastierType.String, openScopes.Count-1, t.val.Length-2));
+                                  /*
+                                    putting each character temporarly on the stack as a character type
+                                    each character gets a name of <name>[index]
+                                  */
+                                  for(int i = 1; i < t.val.Length-1; i++){
+                                    currentScope.Push(new Symbol(name+"["+(i-1)+"]", (int)TastierKind.Const, (int)TastierType.Char, openScopes.Count-1, (int)t.val[i]));
+                                  }
+                                .)
+  )';'.
 
 /*------------------------------------------------------------------------*/
 

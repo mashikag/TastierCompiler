@@ -109,6 +109,7 @@ parseInstruction lineNumber text =
     ["Leave"]       -> Right $ I.Nullary I.Leave
     ["Read"]        -> Right $ I.Nullary I.Read
     ["Write"]       -> Right $ I.Nullary I.Write
+    ["WriteChar"]   -> Right $ I.Nullary I.WriteChar
     ["Halt"]        -> Right $ I.Nullary I.Halt
     ["Dup"]         -> Right $ I.Nullary I.Dup
     ["Nop"]         -> Right $ I.Nullary I.Nop

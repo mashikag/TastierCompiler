@@ -37,7 +37,7 @@
 module TastierMachine.Machine where
 import qualified TastierMachine.Instructions as Instructions
 import Data.Int (Int8, Int16)
-import Data.Char (intToDigit)
+import Data.Char (intToDigit, chr)
 import Numeric (showIntAtBase)
 import Data.Bits (complement)
 import Data.Array ((//), (!), Array, elems)
@@ -202,6 +202,11 @@ run = do
 
         Instructions.Write  -> do
           tell $ [show $ smem ! (rtp-1)]
+          put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
+          run
+          
+        Instructions.WriteChar -> do
+          tell $ [show $ chr $ fromIntegral $ smem ! (rtp-1)]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 

@@ -26,7 +26,10 @@ parseInstruction lineNumber text =
     ["Mul"]         -> Right $ I.Nullary I.Mul
     ["Div"]         -> Right $ I.Nullary I.Div
     ["Equ"]         -> Right $ I.Nullary I.Equ
+    ["NEq"]         -> Right $ I.Nullary I.NEq
+    ["LEq"]         -> Right $ I.Nullary I.LEq
     ["Lss"]         -> Right $ I.Nullary I.Lss
+    ["GEq"]         -> Right $ I.Nullary I.GEq
     ["Gtr"]         -> Right $ I.Nullary I.Gtr
     ["Neg"]         -> Right $ I.Nullary I.Neg
     ["Load", a, b]  ->
@@ -106,6 +109,7 @@ parseInstruction lineNumber text =
     ["Leave"]       -> Right $ I.Nullary I.Leave
     ["Read"]        -> Right $ I.Nullary I.Read
     ["Write"]       -> Right $ I.Nullary I.Write
+    ["WriteChar"]   -> Right $ I.Nullary I.Write
     ["Halt"]        -> Right $ I.Nullary I.Halt
     ["Dup"]         -> Right $ I.Nullary I.Dup
     ["Nop"]         -> Right $ I.Nullary I.Nop
