@@ -7,13 +7,22 @@ program Test {
   const hope1 := 10;
   const strTest := "Proba";
   
+  Struct Rectangle{
+    int width;
+    int height;
+  }
+  
+  int x [5][5];
   
   void Main() {
     int test;
-    int testArray [5];
+    int testArray [5][5];
     
+    Struct Rectangle rect;
+    rect.width := 999;
     test := false ? 1 : 2;
     write test;
+    testArray:= x;
     switch(test){
       case 2{
         write 2;
@@ -27,9 +36,10 @@ program Test {
         write 7;      
       }
     }
+    write rect.width;
     write hope;
     write strTest;
-    testArray[2] := 5;
-    write testArray[2];
+    testArray[1][1] := 5;
+    write testArray[1][1];
   }
 }

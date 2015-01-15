@@ -15,7 +15,8 @@ COMPILER Tastier
   enum TastierKind : int {  // kinds of symbol
     Const,
     Var,
-    Proc
+    Proc,
+    Struct
   };
 
 /*
@@ -240,6 +241,35 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   return null; // if the name wasn't found in any open scopes.
 }
 
+
+Symbol[] lookupStruct(Stack<Scope> scopes, string name) {
+  int stackFrameOffset = 0;
+  int variableOffset = 0;
+  List<Symbol> resSyms = new List<Symbol>();
+
+  foreach (Scope scope in scopes) {
+    foreach (Symbol s in scope) {
+      if(s.Item1.Contains(".")){
+        string[] sep = {"."};
+        string[] res = s.Item1.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+        
+        if (res.Length==2 && res[0]==name) {
+          resSyms.Add(s);
+        }
+      }
+      else {
+        variableOffset += 1;
+      }
+    }
+    if(resSyms.Count != 0){
+      return resSyms.ToArray();
+    }
+    stackFrameOffset += 1;
+    variableOffset = 0;
+  }
+  return null; // if the name wasn't found in any open scopes.
+}
+
 /*
   You may notice that when we use a LoadG or StoG instruction, we add 3 to
   the address of the item being loaded or stored. This is because the
@@ -306,10 +336,14 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
 =                               (.  type = TastierType.Undefined; .)
   ( Ident<out name>
+    [
+      "."(.string structName = name;.)
+      Ident<out name>(.name = structName + name;.)
+    ]
     {
       '['number                 (.  name += "["+t.val+"]"; .)
       ']'  
-    }             
+    }
                                 (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -454,7 +488,11 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
 
 Stat                            (.  TastierType type; string name; Symbol sym; bool external = false; bool isExternal = false; .)
 
-= Ident<out name>
+= (Ident<out name>
+  [ 
+    "."                         (.string structName = name;.)
+    Ident<out name>             (.name = structName +"."+ name;.)
+  ]
   {"[" number                   (.
                                     name += "["+t.val+"]"; 
                                 .)
@@ -554,7 +592,8 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                   }
                                 .)
-    )
+                                
+      )                          
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
@@ -566,6 +605,30 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
                                 .)
   )
+)
+|  "Struct"
+   Ident<out name>
+                                (.
+                                  string structName = name;
+                                  Scope currentScope = openScopes.Peek();
+                                .)
+    Ident<out name>';'          (.
+                                  sym = lookup(openScopes, structName);
+                                  if(sym.Item2 != (int)TastierKind.Struct){
+                                    SemErr(structName + " is not an already exisiting structure. ");
+                                  }
+                                  Symbol[] structItems = lookupStruct(openScopes, structName);
+                                  int len = structItems.Length;
+                                  for(int i = 0; i < len; i++){
+                                    
+                                    string[] sep = {"."};
+                                    string varName = (structItems[i].Item1.Split(sep, StringSplitOptions.RemoveEmptyEntries))[1];
+                                    Console.WriteLine(varName);
+                                    currentScope.Push(new Symbol(name+"."+varName, (int)TastierKind.Var, (int)TastierType.Integer, 
+                                      openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                  }
+                                  
+                                .)        
 | "switch" (.Symbol switchSym; int n;.)
   '(' Ident<out name> ')' (.
                             openBreakableStats.Push(generateLabel());
@@ -777,7 +840,7 @@ Tastier                         (.  string name; bool external = false; .)
                                     openScopes.Push(new Scope());
                                 .)
   '{'
-  { ConstDecl}
+  { ConstDecl | StructDecl}
   { VarDecl<external> | ProcDecl | ExternDecl }
   '}'                           (.
                                     if (openScopes.Peek().Count == 0) {
@@ -790,17 +853,19 @@ Tastier                         (.  string name; bool external = false; .)
                                         header.Add(new Instruction("", ".var " + ((int)s.Item3) + " " + s.Item1));
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".proc " + s.Item1));
-                                      } else if (s.Item2 != (int)TastierKind.Const ){
+                                      } else if (s.Item2 != (int)TastierKind.Const && s.Item2 != (int)TastierKind.Struct){
+                                        Console.WriteLine("was here : " + s.Item1);
                                         SemErr("global item " + s.Item1 + " has no defined type");
-                                      }
+                                      } 
                                     }
+                                    
                                     foreach (Symbol s in externalDeclarations) {
                                       if (s.Item2 == (int)TastierKind.Var) {
                                         header.Add(new Instruction("", ".external var " + ((int)s.Item3) + " " + s.Item1));
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".external proc " + s.Item1));
                                       } else {
-                                        SemErr("external item " + s.Item1 + " has no defined type");
+                                        SemErr("external item " + s.Item1 + " has no defined type" + s.Item3);
                                       }
                                     }
                                     header.AddRange(program);
@@ -896,8 +961,6 @@ VarDecl<bool external>          (.
                                     for(int i = 0; i < dims.Count; i++)
                                       totLen *= dims[i];
                                     
-                                    Console.Write("Total Length: " + totLen);
-                                    
                                     int[] tArr = dims.ToArray();
                                     
                                     for(int i = 0; tArr.Length > i; i++)
@@ -910,7 +973,6 @@ VarDecl<bool external>          (.
                                       string tempName = name;
                                       for(int i = 0; i < tArr.Length; i++)
                                         tempName += "[" + tArr[i] + "]";
-                                      Console.Write(count+" => " + tempName + "; ");
                                       
                                       Symbol elemSym;
                                       if (external) {
@@ -954,11 +1016,39 @@ VarDecl<bool external>          (.
   } ';'.
 
 /*------------------------------------------------------------------------*/
+StructDecl
+=                               (.string structName; Symbol structSym; Scope currentScope = openScopes.Peek();.)
+  "Struct"
+  Ident<out structName>         (.
+                                  structSym = new Symbol(structName, (int)TastierKind.Struct, (int)TastierType.Undefined, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var));
+                                  currentScope.Push(structSym);
+                                  
+                                .)
+  '{'
+    {                           (.string name; TastierType type;.)
+      Type<out type>            (.
+                                  if(type == TastierType.String){
+                                    SemErr("integer or boolean type variable declaration expected instead received " + type);
+                                  }
+                                .)
+      Ident<out name>           (.
+                                  if(_lookup(currentScope, structName+"."+name) != null){
+                                    SemErr("the variable " + name + "already exists in the " + structName + " structure.");
+                                  }
+                                  
+                                  currentScope.Push(new Symbol(structName + "." + name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                .)
+      ';'
+    }
+  '}'.
+  
+/*-------------------------------------------------------------------------*/
+
 ExternDecl                      (.  string name; bool external = true; Scope currentScope = openScopes.Peek(); int count = currentScope.Count; .)
 = "external"
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
-                                (.  externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1)); .)
+                                (.  externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Integer, 1, -1)); .)
   ) .
 
 END Tastier.

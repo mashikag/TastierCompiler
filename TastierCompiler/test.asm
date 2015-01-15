@@ -1,6 +1,63 @@
-.names 9
+.names 38
 .proc Main
-Main: Enter 27
+.var 1 x[4][4]
+.var 1 x[4][3]
+.var 1 x[4][2]
+.var 1 x[4][1]
+.var 1 x[4][0]
+.var 1 x[3][4]
+.var 1 x[3][3]
+.var 1 x[3][2]
+.var 1 x[3][1]
+.var 1 x[3][0]
+.var 1 x[2][4]
+.var 1 x[2][3]
+.var 1 x[2][2]
+.var 1 x[2][1]
+.var 1 x[2][0]
+.var 1 x[1][4]
+.var 1 x[1][3]
+.var 1 x[1][2]
+.var 1 x[1][1]
+.var 1 x[1][0]
+.var 1 x[0][4]
+.var 1 x[0][3]
+.var 1 x[0][2]
+.var 1 x[0][1]
+.var 1 x[0][0]
+.var 1 x
+.var 1 Rectangle.height
+.var 1 Rectangle.width
+Const 5
+StoG 5
+Const 5
+StoG 5
+StoG 6
+StoG 7
+StoG 8
+StoG 9
+StoG 10
+StoG 11
+StoG 12
+StoG 13
+StoG 14
+StoG 15
+StoG 16
+StoG 17
+StoG 18
+StoG 19
+StoG 20
+StoG 21
+StoG 22
+StoG 23
+StoG 24
+StoG 25
+StoG 26
+StoG 27
+StoG 28
+StoG 29
+StoG 30
+Main: Enter 29
 Const 5
 Sto 0 1
 Const 5
@@ -30,6 +87,8 @@ Sto 0 23
 Sto 0 24
 Sto 0 25
 Sto 0 26
+Const 999
+Sto 0 28
 Const 0
 FJmp L$0
 Const 1
@@ -41,6 +100,8 @@ L$1: Nop
 Sto 0 0
 Load 0 0
 Write
+LoadG 5
+Sto 0 1
 Const 2
 Load 0 0
 Equ
@@ -60,6 +121,8 @@ L$4: Nop
 Const 7
 Write
 L$2: Nop
+Load 0 28
+Write
 Const 5
 Write
 Const 5
