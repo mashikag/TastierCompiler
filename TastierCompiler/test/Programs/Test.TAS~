@@ -14,7 +14,7 @@ program Test {
     
     test := false ? 1 : 2;
     write test;
-    switch(test){/*
+    switch(test){
       case 2{
         write 2;
         break;      
@@ -25,7 +25,7 @@ program Test {
       }
       default{
         write 7;      
-      }*/
+      }
     }
     write hope;
     write strTest;

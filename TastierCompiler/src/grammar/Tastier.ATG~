@@ -306,10 +306,10 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
 =                               (.  type = TastierType.Undefined; .)
   ( Ident<out name>
-    [
+    {
       '['number                 (.  name += "["+t.val+"]"; .)
       ']'  
-    ]             
+    }             
                                 (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -455,10 +455,10 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
 Stat                            (.  TastierType type; string name; Symbol sym; bool external = false; bool isExternal = false; .)
 
 = Ident<out name>
-  ["[" number                   (.
+  {"[" number                   (.
                                     name += "["+t.val+"]"; 
                                 .)
-  "]"]                          (.
+  "]"}                          (.
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -861,7 +861,7 @@ ConstDecl                       (.
 /*------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
-                                    Symbol sym; string name; TastierType type; Scope currentScope = openScopes.Peek();
+                                    Symbol sym; string name; TastierType type; Scope currentScope = openScopes.Peek(); List<int> dims = new List<int>(); bool arr = false;
                                 .)
 = Type<out type>
   Ident<out name>               (.
@@ -873,10 +873,11 @@ VarDecl<bool external>          (.
                                       currentScope.Push(sym);
                                     }
                                 .)  
-  [
+  {
     '['number                    (.
-                                    int arrayLength = Convert.ToInt32(t.val);
-                                    program.Add(new Instruction("","Const " + arrayLength));
+                                    int dimLength = Convert.ToInt32(t.val);
+                                    dims.Add(dimLength);
+                                    program.Add(new Instruction("","Const " + dimLength));
                                     
                                     if (sym.Item4 == 0) {
                                       program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
@@ -886,17 +887,37 @@ VarDecl<bool external>          (.
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                     
+                                    arr = true;
+                                .)
+  ']'}                          (.
+                                  if(arr){
                                     /*************************ALLOCATE SPACE FOR THE ELEMENTS*************************/
-                                    for(int i = 0; i < arrayLength; i++){
+                                    int totLen = 1;
+                                    for(int i = 0; i < dims.Count; i++)
+                                      totLen *= dims[i];
+                                    
+                                    Console.Write("Total Length: " + totLen);
+                                    
+                                    int[] tArr = dims.ToArray();
+                                    
+                                    for(int i = 0; tArr.Length > i; i++)
+                                      tArr[i] = 0;
                                       
-                                      program.Add(new Instruction("", "Const " + 0));
+                                    int count = 0;
+                                    bool finished = false;
+                                    while(!finished){
+                                      count++;
+                                      string tempName = name;
+                                      for(int i = 0; i < tArr.Length; i++)
+                                        tempName += "[" + tArr[i] + "]";
+                                      Console.Write(count+" => " + tempName + "; ");
                                       
                                       Symbol elemSym;
                                       if (external) {
-                                        elemSym = new Symbol(name+"["+i+"]", (int)TastierKind.Var, (int)type, 0, 0);
+                                        elemSym = new Symbol(tempName, (int)TastierKind.Var, (int)type, 0, 0);
                                         externalDeclarations.Push(elemSym);
                                       } else {
-                                        elemSym = new Symbol(name+"["+i+"]", (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count( s => s.Item2 == (int)TastierKind.Var ));
+                                        elemSym = new Symbol(tempName, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count( s => s.Item2 == (int)TastierKind.Var ));
                                         currentScope.Push(elemSym);
                                       }
                                       
@@ -907,9 +928,22 @@ VarDecl<bool external>          (.
                                         int lexicalLevelDifference = Math.Abs(openScopes.Count - elemSym.Item4)-1;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + elemSym.Item5));
                                       }
+                                      
+                                      tArr[tArr.Length-1]++;
+                                      tArr[tArr.Length-1] = tArr[tArr.Length-1] % dims[tArr.Length-1];
+                                      for(int c = (tArr.Length-1); tArr[c]==0;){
+                                        tArr[c] = 0;
+                                        c--;
+                                        if(c < 0){
+                                          finished = true;
+                                          break;
+                                        }
+                                        tArr[c]++;
+                                        tArr[c] = tArr[c]%dims[c];
+                                      }
                                     }
+                                  }
                                 .)
-  ']']
   { ',' Ident<out name>         (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));

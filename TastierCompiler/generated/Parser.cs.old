@@ -439,7 +439,7 @@ Stack<string> openBreakableStats = new Stack<string>();
 		type = TastierType.Undefined; 
 		if (la.kind == 1) {
 			Ident(out name);
-			if (la.kind == 6) {
+			while (la.kind == 6) {
 				Get();
 				Expect(2);
 				name += "["+t.val+"]"; 
@@ -576,7 +576,7 @@ Stack<string> openBreakableStats = new Stack<string>();
 	}
 
 	void VarDecl(bool external) {
-		Symbol sym; string name; TastierType type; Scope currentScope = openScopes.Peek();
+		Symbol sym; string name; TastierType type; Scope currentScope = openScopes.Peek(); List<int> dims = new List<int>(); bool arr = false;
 		
 		Type(out type);
 		Ident(out name);
@@ -587,15 +587,13 @@ Stack<string> openBreakableStats = new Stack<string>();
 		 sym = new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count( s => s.Item2 == (int)TastierKind.Var ));
 		 currentScope.Push(sym);
 		}
-		Console.WriteLine(name);
 		
-		if (la.kind == 6) {
+		while (la.kind == 6) {
 			Get();
 			Expect(2);
-			Console.WriteLine("hasdh");
-			int arrayLength = Convert.ToInt32(t.val);
-			Console.WriteLine(t.val);
-			program.Add(new Instruction("","Const " + arrayLength));
+			int dimLength = Convert.ToInt32(t.val);
+			dims.Add(dimLength);
+			program.Add(new Instruction("","Const " + dimLength));
 			
 			if (sym.Item4 == 0) {
 			 program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
@@ -605,33 +603,64 @@ Stack<string> openBreakableStats = new Stack<string>();
 			 program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
 			}
 			
-			/*************************ALLOCATE SPACE FOR THE ELEMENTS*************************/
-			for(int i = 0; i < arrayLength; i++){
-			 
-			 program.Add(new Instruction("", "Const " + 0));
-			 
-			 Symbol elemSym;
-			 if (external) {
-			   elemSym = new Symbol(name+"["+i+"]", (int)TastierKind.Var, (int)type, 0, 0);
-			   externalDeclarations.Push(elemSym);
-			 } else {
-			   elemSym = new Symbol(name+"["+i+"]", (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count( s => s.Item2 == (int)TastierKind.Var ));
-			   currentScope.Push(elemSym);
-			 }
-			 
-			   Console.WriteLine(name+"["+i+"]");
-			 
-			 if (elemSym.Item4 == 0) {
-			   program.Add(new Instruction("", "StoG " + (elemSym.Item5+3)));
-			 }
-			 else {
-			   int lexicalLevelDifference = Math.Abs(openScopes.Count - elemSym.Item4)-1;
-			   program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + elemSym.Item5));
-			 }
-			}
+			arr = true;
 			
 			Expect(7);
 		}
+		if(arr){
+		 /*************************ALLOCATE SPACE FOR THE ELEMENTS*************************/
+		 int totLen = 1;
+		 for(int i = 0; i < dims.Count; i++)
+		   totLen *= dims[i];
+		 
+		 Console.Write("Total Length: " + totLen);
+		 
+		 int[] tArr = dims.ToArray();
+		 
+		 for(int i = 0; tArr.Length > i; i++)
+		   tArr[i] = 0;
+		   
+		 int count = 0;
+		 bool finished = false;
+		 while(!finished){
+		   count++;
+		   string tempName = name;
+		   for(int i = 0; i < tArr.Length; i++)
+		     tempName += "[" + tArr[i] + "]";
+		   Console.Write(count+" => " + tempName + "; ");
+		   
+		   Symbol elemSym;
+		   if (external) {
+		     elemSym = new Symbol(tempName, (int)TastierKind.Var, (int)type, 0, 0);
+		     externalDeclarations.Push(elemSym);
+		   } else {
+		     elemSym = new Symbol(tempName, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count( s => s.Item2 == (int)TastierKind.Var ));
+		     currentScope.Push(elemSym);
+		   }
+		   
+		   if (elemSym.Item4 == 0) {
+		     program.Add(new Instruction("", "StoG " + (elemSym.Item5+3)));
+		   }
+		   else {
+		     int lexicalLevelDifference = Math.Abs(openScopes.Count - elemSym.Item4)-1;
+		     program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + elemSym.Item5));
+		   }
+		   
+		   tArr[tArr.Length-1]++;
+		   tArr[tArr.Length-1] = tArr[tArr.Length-1] % dims[tArr.Length-1];
+		   for(int c = (tArr.Length-1); tArr[c]==0;){
+		     tArr[c] = 0;
+		     c--;
+		     if(c < 0){
+		       finished = true;
+		       break;
+		     }
+		     tArr[c]++;
+		     tArr[c] = tArr[c]%dims[c];
+		   }
+		 }
+		}
+		
 		while (la.kind == 43) {
 			Get();
 			Ident(out name);
